@@ -46,17 +46,8 @@ class ship:
     sprite.image = pygame.image.load("ship.png")
 
 
-class asteroid:
-    x = random.randint(0, 800)
-    y = random.randint(0, 600)
-    angle = 0
-    renderangle = 0
-    sprite = pygame.sprite.Sprite()
-
-
 class game:
-    title = "Asteroids"
-    text = "Start"
+    score = 0
     bgcolor = black
 
 
@@ -64,13 +55,17 @@ bullets = []
 bullet = pygame.sprite.Sprite()
 bullet.image = pygame.image.load("bullet.png")
 
+asteroids = []
+asteroid = pygame.sprite.Sprite()
+asteroid.image = pygame.image.load("asteroid.png")
+
 while not crashed:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             crashed = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             Mouse_x, Mouse_y = pygame.mouse.get_pos()
-            bullets.append([ship.x, ship.y, math.atan2((-Mouse_x + ship.x), (-Mouse_y + ship.y))])
+            bullets.append([ship.x, ship.y, math.atan2((-Mouse_x + ship.x), (-Mouse_y + ship.y)), False])
     if pygame.key.get_pressed()[pygame.K_w] != 0:
         ship.acceleration = 6
     if pygame.key.get_pressed()[pygame.K_a] != 0:
@@ -80,19 +75,59 @@ while not crashed:
         ship.angle -= .1
         ship.renderangle -= 5.72957795
     if ship.x >= 800:
-        ship.x = 5
+        ship.x = 1
     if ship.x <= 0:
-        ship.x = 795
+        ship.x = 799
     if ship.y >= 600:
-        ship.y = 5
+        ship.y = 1
     if ship.y <= 0:
-        ship.y = 595
-    angle = font.render("{0}".format(ship.angle), True, white)
+        ship.y = 599
+    score = font.render("{0}".format(game.score), True, white)
     ship.x -= math.sin(ship.angle) * ship.acceleration
     ship.y -= math.cos(ship.angle) * ship.acceleration
     if ship.acceleration >= 1:
         ship.acceleration *= 0.96
-    render(ship.x - 15, ship.y - 17, rot_center(ship.sprite.image, ship.renderangle))
+    render(ship.x, ship.y, rot_center(ship.sprite.image, ship.renderangle))
+    if random.randint(0, 100) > 93:
+        if random.random() > 0.5:
+            if random.random() > 0.5:
+                asteroids.append([random.randint(0, 800), 0, random.randint(0, 7), False])
+            else:
+                asteroids.append([random.randint(0, 800), 600, random.randint(0, 7), False])
+        else:
+            if random.random() > 0.5:
+                asteroids.append([0, random.randint(0, 600), random.randint(0, 7), False])
+            else:
+                asteroids.append([800, random.randint(0, 600), random.randint(0, 7), False])
+    for a in range(len(asteroids)):
+        asteroids[a][0] -= math.sin(asteroids[a][2]) * 3
+        asteroids[a][1] -= math.cos(asteroids[a][2]) * 3
+    for a in range(len(asteroids)):
+        for b in range(len(bullets)):
+            if (math.fabs(bullets[b][0] - asteroids[a][0]) < 22) & (math.fabs(bullets[b][1] - asteroids[a][1]) < 22):
+                bullets[b][3] = True
+                asteroids[a][3] = True
+    for a in range(len(asteroids)):
+        if (math.fabs(ship.x - asteroids[a][0]) < 22) & (math.fabs(ship.y - asteroids[a][1]) < 22):
+            crashed = True
+    for a in range(len(asteroids)):
+        if asteroids[a][0] >= 800:
+            asteroids[a][0] = 1
+        if asteroids[a][0] <= 0:
+            asteroids[a][0] = 799
+        if asteroids[a][1] >= 600:
+            asteroids[a][1] = 1
+        if asteroids[a][1] <= 0:
+            asteroids[a][1] = 599
+    for a in asteroids:
+        if a[3] == True:
+            asteroids.remove(a)
+            game.score += 1
+    for b in bullets:
+        if b[3] == True:
+            bullets.remove(b)
+    for a in asteroids:
+        render(a[0], a[1], asteroid.image)
     for b in bullets:
         render(b[0], b[1], bullet.image)
     for b in range(len(bullets)):
@@ -101,7 +136,7 @@ while not crashed:
     for b in bullets:
         if b[0] < 0 or b[0] > 800 or b[1] < 0 or b[1] > 600:
             bullets.remove(b)
-    render(10, 0, angle)
+    render(10, 0, score)
     pygame.display.update()
     clock.tick(50)
     gameDisplay.fill(game.bgcolor)
