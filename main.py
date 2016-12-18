@@ -70,7 +70,7 @@ while not crashed:
             crashed = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             Mouse_x, Mouse_y = pygame.mouse.get_pos()
-            bullets.append([ship.x, ship.y, math.atan2((-Mouse_x+ship.x),(-Mouse_y+ship.y))])
+            bullets.append([ship.x, ship.y, math.atan2((-Mouse_x + ship.x), (-Mouse_y + ship.y))])
     if pygame.key.get_pressed()[pygame.K_w] != 0:
         ship.acceleration = 6
     if pygame.key.get_pressed()[pygame.K_a] != 0:
@@ -90,9 +90,9 @@ while not crashed:
     angle = font.render("{0}".format(ship.angle), True, white)
     ship.x -= math.sin(ship.angle) * ship.acceleration
     ship.y -= math.cos(ship.angle) * ship.acceleration
-    if ship.acceleration >= 2:
-        ship.acceleration *= 0.95
-    render(ship.x-18, ship.y-18, rot_center(ship.sprite.image, ship.renderangle))
+    if ship.acceleration >= 1:
+        ship.acceleration *= 0.96
+    render(ship.x - 15, ship.y - 17, rot_center(ship.sprite.image, ship.renderangle))
     for b in bullets:
         render(b[0], b[1], bullet.image)
     for b in range(len(bullets)):
