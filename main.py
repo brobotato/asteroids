@@ -43,6 +43,7 @@ class ship:
     angle = 0
     renderangle = 0
     acceleration = 0
+    firing = 0
     sprite = pygame.sprite.Sprite()
     sprite.image = pygame.image.load("ship.png")
 
@@ -70,19 +71,19 @@ while not crashed:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 playing = True
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if playing == True:
-                Mouse_x, Mouse_y = pygame.mouse.get_pos()
-                bullets.append([ship.x + 15, ship.y + 17, math.atan2((-Mouse_x + ship.x), (-Mouse_y + ship.y)), False])
     if playing == True:
-        if pygame.key.get_pressed()[pygame.K_w] != 0:
+        if pygame.key.get_pressed()[pygame.K_UP] != 0:
             ship.acceleration = 6
-        if pygame.key.get_pressed()[pygame.K_a] != 0:
+        if pygame.key.get_pressed()[pygame.K_LEFT] != 0:
             ship.angle += .1
             ship.renderangle += 5.72957795
-        if pygame.key.get_pressed()[pygame.K_d] != 0:
+        if pygame.key.get_pressed()[pygame.K_RIGHT] != 0:
             ship.angle -= .1
             ship.renderangle -= 5.72957795
+        if pygame.key.get_pressed()[pygame.K_SPACE] != 0:
+            if ship.firing == 0:
+                bullets.append([ship.x + 15, ship.y + 17, ship.angle, False])
+                ship.firing = 10
         if ship.x >= 800:
             ship.x = 1
         if ship.x <= 0:
@@ -113,8 +114,7 @@ while not crashed:
             asteroids[a][1] -= math.cos(asteroids[a][2]) * 3
         for a in range(len(asteroids)):
             for b in range(len(bullets)):
-                if (math.fabs(bullets[b][0] - asteroids[a][0]) < 22) & (
-                    math.fabs(bullets[b][1] - asteroids[a][1]) < 22):
+                if (math.fabs(bullets[b][0] - asteroids[a][0]) < 22) & (math.fabs(bullets[b][1] - asteroids[a][1]) < 22):
                     bullets[b][3] = True
                     asteroids[a][3] = True
         for a in range(len(asteroids)):
@@ -152,6 +152,8 @@ while not crashed:
                 bullets.remove(b)
         render(ship.x, ship.y, rot_center(ship.sprite.image, ship.renderangle))
         render(10, 10, score)
+        if ship.firing >= 1:
+            ship.firing -= 1
     elif playing == False:
         ship.x = 400
         ship.y = 300
