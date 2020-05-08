@@ -1,1 +1,0 @@
-pyg.exe main.py
